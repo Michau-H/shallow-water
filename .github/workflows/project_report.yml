@@ -1,0 +1,31 @@
+name: project
+on: push
+jobs:
+  pdf:
+    runs-on: ubuntu-22.04
+    steps:
+      - name: instalacje TeX Live
+        run: sudo apt-get install -y texlive-xetex 
+      - name: instalacje innych potrzebnych
+        run: sudo apt-get install pandoc inkscape
+      - name: instalacja python
+        run: python -m pip install --upgrade pip
+      - name: instalacja bibliotek
+        run: pip install ipykernel scipy pint open_atmos_jupyter_utils matplotlib nbconvert PyMPDATA
+      - name: dodanie plikow z repozytorium
+        uses: actions/checkout@v4
+      - name: uruchumienie notebooka
+        run: jupyter nbconvert --to latex --no-input --execute project.ipynb
+      - name: uruchumienie notebooka
+        run: sed -i '/HBox(children=/d' project.tex
+      - name: uruchumienie notebooka
+        run: sed -i 's/\\title{PROJEKT}/\\title{shallow-water}\\author{Michał Hubczak}/' project.tex
+      - name: uruchumienie notebooka
+        run: xelatex -interaction=nonstopmode project.tex
+      - name: uruchumienie notebooka
+        run: xelatex -interaction=nonstopmode project.tex
+      - name: pobieranie artefaktu
+        uses: actions/upload-artifact@v4
+        with:
+          name: raport-pdf
+          path: project.pdf
